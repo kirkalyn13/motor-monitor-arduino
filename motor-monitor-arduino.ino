@@ -109,20 +109,19 @@ void printTemperature(DeviceAddress deviceAddress)
 // SETUP
 void setup(void)
 {
+  Serial.println("MOTOR MONITOR");
+  Serial.println("Initializing...");
   Serial.begin(9600);
-  
-  emon4.current(A3, CURRENT_CALIBRATION);             // Current: input pin, calibration.
-  emon5.current(A4, CURRENT_CALIBRATION); 
-  emon6.current(A5, CURRENT_CALIBRATION); 
 
-  Serial.begin(9600);
-  
-  emon1.voltage(VS1_PIN, VOLT_CAL_1, PHASE_SHIFT);  // Voltage: input pin, calibration, phase_shift
+  // Voltage: input pin, calibration, phase_shift
+  emon1.voltage(VS1_PIN, VOLT_CAL_1, PHASE_SHIFT);  
   emon2.voltage(VS2_PIN, VOLT_CAL_2, PHASE_SHIFT); 
   emon3.voltage(VS3_PIN, VOLT_CAL_3, PHASE_SHIFT); 
 
-  // start serial port
-  Serial.begin(9600);
+  // Current: input pin, calibration.
+  emon4.current(A3, CURRENT_CALIBRATION);             
+  emon5.current(A4, CURRENT_CALIBRATION); 
+  emon6.current(A5, CURRENT_CALIBRATION); 
 
   // locate devices on the bus
   Serial.print("Locating devices...");
@@ -136,10 +135,9 @@ void setup(void)
   if (sensors.isParasitePowerMode()) Serial.println("ON");
   else Serial.println("OFF");
   
-  
+
   if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
   
- 
   Serial.print("Device 0 Address: ");
   printAddress(insideThermometer);
   Serial.println();
