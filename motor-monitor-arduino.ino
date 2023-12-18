@@ -34,9 +34,52 @@ DallasTemperature sensors(&oneWire);
 // arrays to hold device address
 DeviceAddress insideThermometer;
 
+const float CURRENT_OFFSET = 0.55;
+const float PHASE_SHIFT = 1.7;
+const float CURRENT_CALIBRATION = 111.1;
+const int DELAY = 1000;
+
 // VOLTAGE FUNCTIONS:
+void measureVoltage() {
+   // Calculate all. No.of half wavelengths (crossings), time-out
+  emon1.calcVI(25,DELAY);         
+  emon2.calcVI(25,DELAY);
+  emon3.calcVI(25,DELAY);
+
+  //extract Vrms into Variable
+  float supplyVoltage_1   = emon1.Vrms;
+  float supplyVoltage_2   = emon2.Vrms; 
+  float supplyVoltage_3   = emon3.Vrms;              
+
+  Serial.print("Voltage 1 : ");  
+  Serial.println(supplyVoltage_1);
+
+
+  Serial.print("Voltage 2 : ");  
+  Serial.println(supplyVoltage_2);
+
+  Serial.print("Voltage 3 : ");  
+  Serial.println(supplyVoltage_3);
+}
+
+// CURRENT FUNCTIONS
+void measureCurrent() {
+  double Irms_1 = emon4.calcIrms(1480);  // Calculate Irms only
+  Serial.print("Current 1 : "); 
+  Serial.println(Irms_1 - CURRENT_OFFSET);		       // Irms
+  double Irms_2 = emon5.calcIrms(1480);  // Calculate Irms only
+  Serial.print("Current 2 : "); 
+  Serial.println(Irms_2 - CURRENT_OFFSET);		       // Irms
+  double Irms_3 = emon6.calcIrms(1480);  // Calculate Irms only
+  Serial.print("Current 3 : "); 
+  Serial.println(Irms_3 - CURRENT_OFFSET);		       // Irms
+}
 
 // TEMPERATURE FUNCTIONS:
+void measureTemperature() {
+  sensors.requestTemperatures(); // Send the command to get temperatures
+  printTemperature(insideThermometer); // Use a simple function to print out the data
+}
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress)
 {
@@ -57,10 +100,10 @@ void printTemperature(DeviceAddress deviceAddress)
     Serial.println("Error: Could not read temperature data");
     return;
   }
-  Serial.print("Temp C: ");
-  Serial.print(tempC);
-  Serial.print(" Temp F: ");
-  Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
+  Serial.print("Temp C : ");
+  Serial.println(tempC);
+  // Serial.print(" Temp F: ");
+  // Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
 }
 
 // SETUP
@@ -68,19 +111,18 @@ void setup(void)
 {
   Serial.begin(9600);
   
-  emon4.current(A3, 111.1);             // Current: input pin, calibration.
-  emon5.current(A4, 111.1); 
-  emon6.current(A5, 111.1); 
+  emon4.current(A3, CURRENT_CALIBRATION);             // Current: input pin, calibration.
+  emon5.current(A4, CURRENT_CALIBRATION); 
+  emon6.current(A5, CURRENT_CALIBRATION); 
 
   Serial.begin(9600);
   
-  emon1.voltage(VS1_PIN, VOLT_CAL_1, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon2.voltage(VS2_PIN, VOLT_CAL_2, 1.7); 
-  emon3.voltage(VS3_PIN, VOLT_CAL_3, 1.7); 
+  emon1.voltage(VS1_PIN, VOLT_CAL_1, PHASE_SHIFT);  // Voltage: input pin, calibration, phase_shift
+  emon2.voltage(VS2_PIN, VOLT_CAL_2, PHASE_SHIFT); 
+  emon3.voltage(VS3_PIN, VOLT_CAL_3, PHASE_SHIFT); 
 
   // start serial port
   Serial.begin(9600);
-  Serial.println("Dallas Temperature IC Control Library Demo");
 
   // locate devices on the bus
   Serial.print("Locating devices...");
@@ -113,38 +155,7 @@ void setup(void)
 // MAIN LOOP
 void loop(void)
 { 
-  double Irms_1 = emon4.calcIrms(1480);  // Calculate Irms only
-  Serial.println(Irms_1-0.55);		       // Irms
-  double Irms_2 = emon5.calcIrms(1480);  // Calculate Irms only
-  Serial.println(Irms_2-0.55);		       // Irms
-  double Irms_3 = emon6.calcIrms(1480);  // Calculate Irms only
-  Serial.println(Irms_3-0.55);		       // Irms
-
-
-  emon1.calcVI(25,3000);         // Calculate all. No.of half wavelengths (crossings), time-out
-  emon2.calcVI(25,3000);
-  emon3.calcVI(25,3000);
-
-  float supplyVoltage_1   = emon1.Vrms;
-  float supplyVoltage_2   = emon2.Vrms; 
-  float supplyVoltage_3   = emon3.Vrms;              //extract Vrms into Variable
-
-  Serial.print("Voltage 1 : ");  
-  Serial.println(supplyVoltage_1);
-
-
-  Serial.print("Voltage 2 : ");  
-  Serial.println(supplyVoltage_2);
-
-  Serial.print("Voltage 3 : ");  
-  Serial.println(supplyVoltage_3);
-
-  // call sensors.requestTemperatures() to issue a global temperature 
-  // request to all devices on the bus
-  Serial.print("Requesting temperatures...");
-  sensors.requestTemperatures(); // Send the command to get temperatures
-  Serial.println("DONE");
-  
-  // It responds almost immediately. Let's print out the data
-  printTemperature(insideThermometer); // Use a simple function to print out the data
+  measureVoltage();
+  measureCurrent();
+  measureTemperature();
 }
