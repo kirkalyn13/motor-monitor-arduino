@@ -34,9 +34,36 @@ DallasTemperature sensors(&oneWire);
 // arrays to hold device address
 DeviceAddress insideThermometer;
 
-/*
- * Setup function. Here we do the basics
- */
+// VOLTAGE FUNCTIONS:
+
+// TEMPERATURE FUNCTIONS:
+// function to print a device address
+void printAddress(DeviceAddress deviceAddress)
+{
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    if (deviceAddress[i] < 16) Serial.print("0");
+    Serial.print(deviceAddress[i], HEX);
+  }
+}
+
+// function to print the temperature for a device
+void printTemperature(DeviceAddress deviceAddress)
+{
+ 
+  float tempC = sensors.getTempC(deviceAddress);
+  if(tempC == DEVICE_DISCONNECTED_C) 
+  {
+    Serial.println("Error: Could not read temperature data");
+    return;
+  }
+  Serial.print("Temp C: ");
+  Serial.print(tempC);
+  Serial.print(" Temp F: ");
+  Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
+}
+
+// SETUP
 void setup(void)
 {
   Serial.begin(9600);
@@ -83,24 +110,7 @@ void setup(void)
   Serial.println();
 }
 
-// function to print the temperature for a device
-void printTemperature(DeviceAddress deviceAddress)
-{
- 
-  float tempC = sensors.getTempC(deviceAddress);
-  if(tempC == DEVICE_DISCONNECTED_C) 
-  {
-    Serial.println("Error: Could not read temperature data");
-    return;
-  }
-  Serial.print("Temp C: ");
-  Serial.print(tempC);
-  Serial.print(" Temp F: ");
-  Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
-}
-/*
- * Main function. It will request the tempC from the sensors and display on Serial.
- */
+// MAIN LOOP
 void loop(void)
 { 
   double Irms_1 = emon4.calcIrms(1480);  // Calculate Irms only
@@ -118,34 +128,16 @@ void loop(void)
   float supplyVoltage_1   = emon1.Vrms;
   float supplyVoltage_2   = emon2.Vrms; 
   float supplyVoltage_3   = emon3.Vrms;              //extract Vrms into Variable
-  if(supplyVoltage_1 >= 100)
-  {
- Serial.print("Voltage 1 : ");  
- Serial.println(supplyVoltage_1);
-  }
-  else
- {
-   Serial.println("V1 - Power OFF");
-  }
-    if(supplyVoltage_2 >= 100)
-  {
- Serial.print("Voltage 2 : ");  
- Serial.println(supplyVoltage_2);
-  }
-  else
- {
-   Serial.println("V2 - Power OFF");
-  }
 
-    if(supplyVoltage_3 >= 100)
-  {
- Serial.print("Voltage 3 : ");  
- Serial.println(supplyVoltage_3);
-  }
-  else
- {
-   Serial.println("V3 - Power OFF");
-  }
+  Serial.print("Voltage 1 : ");  
+  Serial.println(supplyVoltage_1);
+
+
+  Serial.print("Voltage 2 : ");  
+  Serial.println(supplyVoltage_2);
+
+  Serial.print("Voltage 3 : ");  
+  Serial.println(supplyVoltage_3);
 
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
@@ -156,26 +148,3 @@ void loop(void)
   // It responds almost immediately. Let's print out the data
   printTemperature(insideThermometer); // Use a simple function to print out the data
 }
-
-// function to print a device address
-void printAddress(DeviceAddress deviceAddress)
-{
-  for (uint8_t i = 0; i < 8; i++)
-  {
-    if (deviceAddress[i] < 16) Serial.print("0");
-    Serial.print(deviceAddress[i], HEX);
-  }
-}
-
-
-//void setup()
-//{  
-  
-
-//}
-
-//void loop()
-//{
-  
-
-// }
