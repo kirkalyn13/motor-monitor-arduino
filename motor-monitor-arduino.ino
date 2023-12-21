@@ -228,19 +228,6 @@ void loop(void)
 
     if ( i == 9 ) {
       MetricsModel metrics;
-      // Serial.print(voltageMetrics1/10);
-      // Serial.print(",");
-      // Serial.print(voltageMetrics2/10);
-      // Serial.print(",");
-      // Serial.print(voltageMetrics3/10);
-      // Serial.print(",");
-      // Serial.print(currentMetrics1/10);
-      // Serial.print(",");
-      // Serial.print(currentMetrics2/10);
-      // Serial.print(",");
-      // Serial.print(currentMetrics3/10);
-      // Serial.print(",");
-      // Serial.println(temperatureMetrics/10);
 
       metrics.line1Voltage = voltageMetrics1/10;
       metrics.line2Voltage = voltageMetrics2/10;
