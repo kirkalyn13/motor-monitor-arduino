@@ -95,12 +95,12 @@ Metrics measureVoltage() {
   voltageMetrics.value2   = emon2.Vrms; 
   voltageMetrics.value3   = emon3.Vrms;              
 
-  Serial.print("Voltage 1 : ");  
-  Serial.println(voltageMetrics.value1);
-  Serial.print("Voltage 2 : ");  
-  Serial.println(voltageMetrics.value2);
-  Serial.print("Voltage 3 : ");  
-  Serial.println(voltageMetrics.value3 );
+  // Serial.print("Voltage 1 : ");  
+  // Serial.println(voltageMetrics.value1);
+  // Serial.print("Voltage 2 : ");  
+  // Serial.println(voltageMetrics.value2);
+  // Serial.print("Voltage 3 : ");  
+  // Serial.println(voltageMetrics.value3 );
 
   return voltageMetrics;
 }
@@ -129,7 +129,7 @@ Metrics measureCurrent() {
 // TEMPERATURE FUNCTIONS:
 float measureTemperature() {
   sensors.requestTemperatures(); // Send the command to get temperatures
-  getTemperature(insideThermometer); // Use a simple function to print out the data
+  return getTemperature(insideThermometer); // Use a simple function to print out the data
 }
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress)
@@ -142,7 +142,7 @@ void printAddress(DeviceAddress deviceAddress)
 }
 
 // function to print the temperature for a device
-void getTemperature(DeviceAddress deviceAddress)
+float getTemperature(DeviceAddress deviceAddress)
 {
  
   float tempC = sensors.getTempC(deviceAddress);
@@ -153,6 +153,7 @@ void getTemperature(DeviceAddress deviceAddress)
   }
   // Serial.print("Temp C : ");
   // Serial.println(tempC);
+
   return tempC;
   // Serial.print(" Temp F: ");
   // Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
