@@ -25,7 +25,11 @@ float currentMetrics1 = 0.00;
 float currentMetrics2 = 0.00;
 float currentMetrics3 = 0.00;
 float temperatureMetrics = 0.00;
-const int GRANULARITY = 1000;
+
+const float CURRENT_OFFSET = 0.55;
+const float PHASE_SHIFT = 1.7;
+const float CURRENT_CALIBRATION = 111.1;
+const int DELAY = 1000;
 
 // Include the libraries we need
 #include <OneWire.h>
@@ -50,29 +54,31 @@ struct Metrics {
   float value3;
 };
 
-const float CURRENT_OFFSET = 0.55;
-const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 111.1;
-const int DELAY = 1000;
+struct MetricsModel {
+  float line1Voltage;
+  float line2Voltage;
+  float line3Voltage;
+  float line1Current;
+  float line2Current;
+  float line3Current;
+  float temperature;
+};
 
 // WIFI FUNCTIONS:
-void sendMetrics(float metrics[7]) {
-  Serial.print(metrics[0]);
+void sendMetrics(MetricsModel metrics) {
+  Serial.print(metrics.line1Voltage);
   Serial.print(",");
-  Serial.print(metrics[1]);
+  Serial.print(metrics.line2Voltage);
   Serial.print(",");
-  Serial.print(metrics[2]);
+  Serial.print(metrics.line3Voltage);
   Serial.print(",");
-  Serial.print(metrics[3]);
+  Serial.print(metrics.line1Current);
   Serial.print(",");
-  Serial.print(metrics[4]);
+  Serial.print(metrics.line2Current);
   Serial.print(",");
-  Serial.print(metrics[5]);
+  Serial.print(metrics.line3Current);
   Serial.print(",");
-  Serial.print(metrics[6]);
-  Serial.print(",");
-  Serial.print(metrics[7]);
-  Serial.println(",");
+  Serial.println(metrics.temperature);
 }
 
 // VOLTAGE FUNCTIONS:
@@ -89,15 +95,12 @@ Metrics measureVoltage() {
   voltageMetrics.value2   = emon2.Vrms; 
   voltageMetrics.value3   = emon3.Vrms;              
 
-  // Serial.print("Voltage 1 : ");  
-  // Serial.println(supplyVoltage_1);
-
-
-  // Serial.print("Voltage 2 : ");  
-  // Serial.println(supplyVoltage_2);
-
-  // Serial.print("Voltage 3 : ");  
-  // Serial.println(supplyVoltage_3);
+  Serial.print("Voltage 1 : ");  
+  Serial.println(voltageMetrics.value1);
+  Serial.print("Voltage 2 : ");  
+  Serial.println(voltageMetrics.value2);
+  Serial.print("Voltage 3 : ");  
+  Serial.println(voltageMetrics.value3 );
 
   return voltageMetrics;
 }
@@ -223,19 +226,30 @@ void loop(void)
     temperatureMetrics += measureTemperature();
 
     if ( i == 9 ) {
-      Serial.print(voltageMetrics1/10);
-      Serial.print(",");
-      Serial.print(voltageMetrics2/10);
-      Serial.print(",");
-      Serial.print(voltageMetrics3/10);
-      Serial.print(",");
-      Serial.print(currentMetrics1/10);
-      Serial.print(",");
-      Serial.print(currentMetrics2/10);
-      Serial.print(",");
-      Serial.print(currentMetrics3/10);
-      Serial.print(",");
-      Serial.println(temperatureMetrics/10);
+      MetricsModel metrics;
+      // Serial.print(voltageMetrics1/10);
+      // Serial.print(",");
+      // Serial.print(voltageMetrics2/10);
+      // Serial.print(",");
+      // Serial.print(voltageMetrics3/10);
+      // Serial.print(",");
+      // Serial.print(currentMetrics1/10);
+      // Serial.print(",");
+      // Serial.print(currentMetrics2/10);
+      // Serial.print(",");
+      // Serial.print(currentMetrics3/10);
+      // Serial.print(",");
+      // Serial.println(temperatureMetrics/10);
+
+      metrics.line1Voltage = voltageMetrics1/10;
+      metrics.line2Voltage = voltageMetrics2/10;
+      metrics.line3Voltage = voltageMetrics3/10;
+      metrics.line1Current = currentMetrics1/10;
+      metrics.line2Current = currentMetrics2/10;
+      metrics.line3Current = currentMetrics3/10;
+      metrics.temperature = temperatureMetrics/10;
+
+      sendMetrics(metrics);
     }
   }
 }
