@@ -92,8 +92,8 @@ Metrics measureVoltage() {
 
   //extract Vrms into Variable
   voltageMetrics.value1  = emon1.Vrms;
-  voltageMetrics.value2   = emon2.Vrms; 
-  voltageMetrics.value3   = emon3.Vrms;              
+  voltageMetrics.value2  = emon2.Vrms; 
+  voltageMetrics.value3  = emon3.Vrms;              
 
   // Serial.print("Voltage 1 : ");  
   // Serial.println(voltageMetrics.value1);
@@ -109,19 +109,20 @@ Metrics measureVoltage() {
 Metrics measureCurrent() {
   Metrics currentMetrics;
 
-  double Irms_1 = emon4.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
-  // Serial.print("Current 1 : "); 
-  // Serial.println(Irms_1 - CURRENT_OFFSET);		       // Irms
-  double Irms_2 = emon5.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
-  // Serial.print("Current 2 : "); 
-  // Serial.println(Irms_2 - CURRENT_OFFSET);		       // Irms
-  double Irms_3 = emon6.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
-  // Serial.print("Current 3 : "); 
-  // Serial.println(Irms_3 - CURRENT_OFFSET);		       // Irms
+  double irms1 = emon4.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
+  double irms2 = emon5.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
+  double irms3 = emon6.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
 
-  currentMetrics.value1 = Irms_1;
-  currentMetrics.value2 = Irms_2;
-  currentMetrics.value3 = Irms_3;
+  // Serial.print("Current 1 : "); 
+  // Serial.println(irms1);		       // Irms
+  // Serial.print("Current 2 : "); 
+  // Serial.println(irms2);		       // Irms
+  // Serial.print("Current 3 : "); 
+  // Serial.println(irms3);		       // Irms
+
+  currentMetrics.value1 = irms1;
+  currentMetrics.value2 = irms2;
+  currentMetrics.value3 = irms3;
 
   return currentMetrics;
 }
