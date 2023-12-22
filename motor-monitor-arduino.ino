@@ -26,9 +26,8 @@ float currentMetrics2 = 0.00;
 float currentMetrics3 = 0.00;
 float temperatureMetrics = 0.00;
 
-const float CURRENT_OFFSET = 0.55;
 const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 111.1;
+const float CURRENT_CALIBRATION = 14.5;
 const int DELAY = 1000;
 
 // Include the libraries we need
@@ -109,9 +108,9 @@ Metrics measureVoltage() {
 Metrics measureCurrent() {
   Metrics currentMetrics;
 
-  double irms1 = emon4.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
-  double irms2 = emon5.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
-  double irms3 = emon6.calcIrms(1480) - CURRENT_OFFSET;  // Calculate Irms only
+  double irms1 = emon4.calcIrms(1480);  // Calculate Irms only
+  double irms2 = emon5.calcIrms(1480);  // Calculate Irms only
+  double irms3 = emon6.calcIrms(1480);  // Calculate Irms only
 
   // Serial.print("Current 1 : "); 
   // Serial.println(irms1);		       // Irms
