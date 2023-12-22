@@ -27,8 +27,8 @@ float currentMetrics3 = 0.00;
 float temperatureMetrics = 0.00;
 
 const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 14.5;
-const int DELAY = 1000;
+const float CURRENT_CALIBRATION = 14;
+const int DELAY = 100;
 
 // Include the libraries we need
 #include <OneWire.h>
