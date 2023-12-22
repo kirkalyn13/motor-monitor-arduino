@@ -5,9 +5,9 @@ EnergyMonitor emon6;
 
 #include "EmonLib.h"             // Include Emon Library
 
-#define VOLT_CAL_1 407
-#define VOLT_CAL_2 395
-#define VOLT_CAL_3 510
+#define VOLT_CAL_1 395
+#define VOLT_CAL_2 390
+#define VOLT_CAL_3 505
 
 EnergyMonitor emon1;             // Create an instance
 EnergyMonitor emon2; 
@@ -17,6 +17,18 @@ const int VS1_PIN = A0 ;
 const int VS2_PIN = A1 ;
 const int VS3_PIN = A2 ;
 
+// For metrics computation
+float voltageMetrics1 = 0.00;
+float voltageMetrics2 = 0.00;
+float voltageMetrics3 = 0.00;
+float currentMetrics1 = 0.00;
+float currentMetrics2 = 0.00;
+float currentMetrics3 = 0.00;
+float temperatureMetrics = 0.00;
+
+const float PHASE_SHIFT = 1.7;
+const float CURRENT_CALIBRATION = 14.5;
+const int DELAY = 1000;
 
 // Include the libraries we need
 #include <OneWire.h>
@@ -34,51 +46,90 @@ DallasTemperature sensors(&oneWire);
 // arrays to hold device address
 DeviceAddress insideThermometer;
 
-const float CURRENT_OFFSET = 0.55;
-const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 111.1;
-const int DELAY = 1000;
+// Metrics Struct
+struct Metrics {
+  float value1;
+  float value2;
+  float value3;
+};
+
+struct MetricsModel {
+  float line1Voltage;
+  float line2Voltage;
+  float line3Voltage;
+  float line1Current;
+  float line2Current;
+  float line3Current;
+  float temperature;
+};
+
+// WIFI FUNCTIONS:
+void sendMetrics(MetricsModel metrics) {
+  Serial.print(metrics.line1Voltage);
+  Serial.print(",");
+  Serial.print(metrics.line2Voltage);
+  Serial.print(",");
+  Serial.print(metrics.line3Voltage);
+  Serial.print(",");
+  Serial.print(metrics.line1Current);
+  Serial.print(",");
+  Serial.print(metrics.line2Current);
+  Serial.print(",");
+  Serial.print(metrics.line3Current);
+  Serial.print(",");
+  Serial.println(metrics.temperature);
+}
 
 // VOLTAGE FUNCTIONS:
-void measureVoltage() {
+Metrics measureVoltage() {
+  Metrics voltageMetrics;
+
    // Calculate all. No.of half wavelengths (crossings), time-out
   emon1.calcVI(25,DELAY);         
   emon2.calcVI(25,DELAY);
   emon3.calcVI(25,DELAY);
 
   //extract Vrms into Variable
-  float supplyVoltage_1   = emon1.Vrms;
-  float supplyVoltage_2   = emon2.Vrms; 
-  float supplyVoltage_3   = emon3.Vrms;              
+  voltageMetrics.value1  = emon1.Vrms;
+  voltageMetrics.value2  = emon2.Vrms; 
+  voltageMetrics.value3  = emon3.Vrms;              
 
-  Serial.print("Voltage 1 : ");  
-  Serial.println(supplyVoltage_1);
+  // Serial.print("Voltage 1 : ");  
+  // Serial.println(voltageMetrics.value1);
+  // Serial.print("Voltage 2 : ");  
+  // Serial.println(voltageMetrics.value2);
+  // Serial.print("Voltage 3 : ");  
+  // Serial.println(voltageMetrics.value3 );
 
-
-  Serial.print("Voltage 2 : ");  
-  Serial.println(supplyVoltage_2);
-
-  Serial.print("Voltage 3 : ");  
-  Serial.println(supplyVoltage_3);
+  return voltageMetrics;
 }
 
 // CURRENT FUNCTIONS
-void measureCurrent() {
-  double Irms_1 = emon4.calcIrms(1480);  // Calculate Irms only
-  Serial.print("Current 1 : "); 
-  Serial.println(Irms_1 - CURRENT_OFFSET);		       // Irms
-  double Irms_2 = emon5.calcIrms(1480);  // Calculate Irms only
-  Serial.print("Current 2 : "); 
-  Serial.println(Irms_2 - CURRENT_OFFSET);		       // Irms
-  double Irms_3 = emon6.calcIrms(1480);  // Calculate Irms only
-  Serial.print("Current 3 : "); 
-  Serial.println(Irms_3 - CURRENT_OFFSET);		       // Irms
+Metrics measureCurrent() {
+  Metrics currentMetrics;
+
+  double irms1 = emon4.calcIrms(1480);  // Calculate Irms only
+  double irms2 = emon5.calcIrms(1480);  // Calculate Irms only
+  double irms3 = emon6.calcIrms(1480);  // Calculate Irms only
+
+  // Serial.print("Current 1 : "); 
+  // Serial.println(irms1);		       // Irms
+  // Serial.print("Current 2 : "); 
+  // Serial.println(irms2);		       // Irms
+  // Serial.print("Current 3 : "); 
+  // Serial.println(irms3);		       // Irms
+
+  currentMetrics.value1 = irms1;
+  currentMetrics.value2 = irms2;
+  currentMetrics.value3 = irms3;
+
+  return currentMetrics;
 }
 
 // TEMPERATURE FUNCTIONS:
-void measureTemperature() {
+float measureTemperature() {
   sensors.requestTemperatures(); // Send the command to get temperatures
-  printTemperature(insideThermometer); // Use a simple function to print out the data
+  return getTemperature(insideThermometer); // Use a simple function to print out the data
 }
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress)
@@ -91,17 +142,19 @@ void printAddress(DeviceAddress deviceAddress)
 }
 
 // function to print the temperature for a device
-void printTemperature(DeviceAddress deviceAddress)
+float getTemperature(DeviceAddress deviceAddress)
 {
  
   float tempC = sensors.getTempC(deviceAddress);
   if(tempC == DEVICE_DISCONNECTED_C) 
   {
-    Serial.println("Error: Could not read temperature data");
+    // Serial.println("Error: Could not read temperature data");
     return;
   }
-  Serial.print("Temp C : ");
-  Serial.println(tempC);
+  // Serial.print("Temp C : ");
+  // Serial.println(tempC);
+
+  return tempC;
   // Serial.print(" Temp F: ");
   // Serial.println(DallasTemperature::toFahrenheit(tempC)); // Converts tempC to Fahrenheit
 }
@@ -153,7 +206,38 @@ void setup(void)
 // MAIN LOOP
 void loop(void)
 { 
-  measureVoltage();
-  measureCurrent();
-  measureTemperature();
+  voltageMetrics1 = 0.00;
+  voltageMetrics2 = 0.00;
+  voltageMetrics3 = 0.00;
+  currentMetrics1 = 0.00;
+  currentMetrics2 = 0.00;
+  currentMetrics3 = 0.00;
+  temperatureMetrics = 0.00;
+
+  for (int i = 0; i < 10; i++) {
+    Metrics voltageMetrics = measureVoltage();
+    Metrics currentMetrics = measureCurrent();
+
+    voltageMetrics1 += voltageMetrics.value1;
+    voltageMetrics2 += voltageMetrics.value2;
+    voltageMetrics3 += voltageMetrics.value3;
+    currentMetrics1 += currentMetrics.value1;
+    currentMetrics2 += currentMetrics.value2;
+    currentMetrics3 += currentMetrics.value3;
+    temperatureMetrics += measureTemperature();
+
+    if ( i == 9 ) {
+      MetricsModel metrics;
+
+      metrics.line1Voltage = voltageMetrics1/10;
+      metrics.line2Voltage = voltageMetrics2/10;
+      metrics.line3Voltage = voltageMetrics3/10;
+      metrics.line1Current = currentMetrics1/10;
+      metrics.line2Current = currentMetrics2/10;
+      metrics.line3Current = currentMetrics3/10;
+      metrics.temperature = temperatureMetrics/10;
+
+      sendMetrics(metrics);
+    }
+  }
 }
