@@ -5,9 +5,9 @@ EnergyMonitor emon6;
 
 #include "EmonLib.h"             // Include Emon Library
 
-#define VOLT_CAL_1 407
-#define VOLT_CAL_2 395
-#define VOLT_CAL_3 510
+#define VOLT_CAL_1 395
+#define VOLT_CAL_2 390
+#define VOLT_CAL_3 505
 
 EnergyMonitor emon1;             // Create an instance
 EnergyMonitor emon2; 
@@ -149,7 +149,7 @@ float getTemperature(DeviceAddress deviceAddress)
   float tempC = sensors.getTempC(deviceAddress);
   if(tempC == DEVICE_DISCONNECTED_C) 
   {
-    Serial.println("Error: Could not read temperature data");
+    // Serial.println("Error: Could not read temperature data");
     return;
   }
   // Serial.print("Temp C : ");
