@@ -34,9 +34,8 @@ DallasTemperature sensors(&oneWire);
 // arrays to hold device address
 DeviceAddress insideThermometer;
 
-const float CURRENT_OFFSET = 0.55;
 const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 111.1;
+const float CURRENT_CALIBRATION = 14.5;
 const int DELAY = 1000;
 
 // VOLTAGE FUNCTIONS:
@@ -64,15 +63,15 @@ void measureVoltage() {
 
 // CURRENT FUNCTIONS
 void measureCurrent() {
-  double Irms_1 = emon4.calcIrms(1480);  // Calculate Irms only
+  double Irms_1 = emon4.calcIrms(CURRENT_CALIBRATION);  // Calculate Irms only
   Serial.print("Current 1 : "); 
-  Serial.println(Irms_1 - CURRENT_OFFSET);		       // Irms
-  double Irms_2 = emon5.calcIrms(1480);  // Calculate Irms only
+  Serial.println(Irms_1);		       // Irms
+  double Irms_2 = emon5.calcIrms(CURRENT_CALIBRATION);  // Calculate Irms only
   Serial.print("Current 2 : "); 
-  Serial.println(Irms_2 - CURRENT_OFFSET);		       // Irms
-  double Irms_3 = emon6.calcIrms(1480);  // Calculate Irms only
+  Serial.println(Irms_2);		       // Irms
+  double Irms_3 = emon6.calcIrms(CURRENT_CALIBRATION);  // Calculate Irms only
   Serial.print("Current 3 : "); 
-  Serial.println(Irms_3 - CURRENT_OFFSET);		       // Irms
+  Serial.println(Irms_3);		       // Irms
 }
 
 // TEMPERATURE FUNCTIONS:
@@ -153,7 +152,7 @@ void setup(void)
 // MAIN LOOP
 void loop(void)
 { 
-  measureVoltage();
+  //measureVoltage();
   measureCurrent();
-  measureTemperature();
+ // measureTemperature();
 }
