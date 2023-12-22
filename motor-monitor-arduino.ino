@@ -35,7 +35,9 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress insideThermometer;
 
 const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 14.5;
+const float CURRENT_CALIBRATION_1 = 14;
+const float CURRENT_CALIBRATION_2 = 14;
+const float CURRENT_CALIBRATION_3 = 14;
 const int DELAY = 1000;
 
 // VOLTAGE FUNCTIONS:
@@ -63,15 +65,17 @@ void measureVoltage() {
 
 // CURRENT FUNCTIONS
 void measureCurrent() {
-  double Irms_1 = emon4.calcIrms(CURRENT_CALIBRATION);  // Calculate Irms only
+  double Irms_1 = emon4.calcIrms(1480);  // Calculate Irms only
   Serial.print("Current 1 : "); 
   Serial.println(Irms_1);		       // Irms
-  double Irms_2 = emon5.calcIrms(CURRENT_CALIBRATION);  // Calculate Irms only
+  double Irms_2 = emon5.calcIrms(1480);  // Calculate Irms only
   Serial.print("Current 2 : "); 
   Serial.println(Irms_2);		       // Irms
-  double Irms_3 = emon6.calcIrms(CURRENT_CALIBRATION);  // Calculate Irms only
+  double Irms_3 = emon6.calcIrms(1480);  // Calculate Irms only
   Serial.print("Current 3 : "); 
   Serial.println(Irms_3);		       // Irms
+
+  delay(1000);
 }
 
 // TEMPERATURE FUNCTIONS:
@@ -118,9 +122,9 @@ void setup(void)
   emon3.voltage(VS3_PIN, VOLT_CAL_3, PHASE_SHIFT); 
 
   // Current: input pin, calibration.
-  emon4.current(A3, CURRENT_CALIBRATION);             
-  emon5.current(A4, CURRENT_CALIBRATION); 
-  emon6.current(A5, CURRENT_CALIBRATION); 
+  emon4.current(A3, CURRENT_CALIBRATION_1);             
+  emon5.current(A4, CURRENT_CALIBRATION_2); 
+  emon6.current(A5, CURRENT_CALIBRATION_3); 
 
   // locate devices on the bus
   Serial.print("Locating devices...");
