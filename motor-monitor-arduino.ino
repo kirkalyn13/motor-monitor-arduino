@@ -1,6 +1,8 @@
 #include "EmonLib.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h> 
 
 // UNIT ID (UNIQUE PER UNIT):
 #define UNIT_ID 1137
@@ -29,6 +31,15 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress insideThermometer;
 
+// WIFI CONFIGURATIONS:
+const char* ssid     = ""; // WiFi SSID
+const char* password = ""; // WiFi Password
+const char* host = "motor-monitor-backend.onrender.com"; // Backend server URL
+const String userAgent = "motor-monitor-arduino/1.0";
+const int port = 443;
+const int timeout = 10000; // RTO at 10 seconds
+WiFiClientSecure wifiClient;
+
 // For metrics computation
 float voltageMetrics1 = 0.00;
 float voltageMetrics2 = 0.00;
@@ -56,7 +67,102 @@ struct MetricsModel {
 };
 
 // WIFI FUNCTIONS:
-void sendMetrics(MetricsModel metrics) {
+void initializeWifi()
+{
+  delay(1000);
+  WiFi.mode(WIFI_OFF);        
+  WiFi.mode(WIFI_STA);        
+  
+  WiFi.begin(ssid, password); 
+  Serial.println("");
+
+  Serial.print("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  // If connection successful show IP address in serial monitor
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+  wifiClient.setInsecure();
+}
+
+bool postRequest(String method, String endpoint)
+{
+  bool isSuccess = false;
+  bool finishedHeaders = false;
+  bool currentLineIsBlank = true;
+  bool gotResponse = false;
+  long now;
+  String headers = "";
+  String body = "";
+
+  if (wifiClient.connect(host, port)) {
+    // Format POST Request
+    wifiClient.println("POST " + endpoint + " HTTP/1.1");
+    wifiClient.print("Host: "); wifiClient.println(host);
+    wifiClient.println("Content-Type: application/x-www-form-urlencoded");
+    wifiClient.println("User-Agent: " + userAgent);
+    wifiClient.println("");
+
+    now = millis();
+    while (millis() - now < timeout) {
+      while (wifiClient.available()) {
+        char c = wifiClient.read();
+        // Serial.print(c); // For testing only
+
+        if (finishedHeaders) {
+          body = body + c; 
+        } else {
+          if (currentLineIsBlank && c == '\n') {
+            finishedHeaders = true;
+          }
+          else {
+            headers = headers + c;
+          }
+        }
+
+        if (c == '\n') {
+          currentLineIsBlank = true;
+        } else if (c != '\r') {
+          currentLineIsBlank = false;
+        }
+
+        gotResponse = true;
+
+      }
+      if (gotResponse) {
+        isSuccess = true;
+        break;
+      }
+    }
+  }
+
+  return isSuccess;
+}
+
+void sendMetrics(int id, MetricsModel metrics) 
+{
+  String queryParams = "line1Voltage=" + String(metrics.line1Voltage) + "&"
+  + "line2Voltage=" + String(metrics.line2Voltage) + "&"
+  + "line3Voltage=" + String(metrics.line3Voltage) + "&"
+  + "line1Current=" + String(metrics.line1Current) + "&"
+  + "line2Current=" + String(metrics.line2Current) + "&"
+  + "line3Current=" + String(metrics.line3Current) + "&"
+  + "temperature=" + String(metrics.temperature);
+  String endpoint = "/api/v1/metrics/" + String(id) + "?" + queryParams;
+
+  bool result = postRequest("POST", endpoint);
+  if (result == true) {
+    Serial.print("OK: ");
+  } else {
+    Serial.print("ERROR: ");
+  }
+
   Serial.print(metrics.line1Voltage);
   Serial.print(",");
   Serial.print(metrics.line2Voltage);
@@ -70,6 +176,11 @@ void sendMetrics(MetricsModel metrics) {
   Serial.print(metrics.line3Current);
   Serial.print(",");
   Serial.println(metrics.temperature);
+
+}
+
+void sendMetrics(MetricsModel metrics) {
+  
 }
 
 // VOLTAGE FUNCTIONS:
@@ -193,6 +304,8 @@ void setup(void)
   Serial.print("Device 0 Resolution: ");
   Serial.print(sensors.getResolution(insideThermometer), DEC); 
   Serial.println();
+
+  initializeWifi();
 }
 
 // MAIN LOOP
@@ -229,7 +342,7 @@ void loop(void)
       metrics.line3Current = currentMetrics3/10;
       metrics.temperature = temperatureMetrics/10;
 
-      sendMetrics(metrics);
+      sendMetrics(UNIT_ID, metrics);
     }
   }
 }
