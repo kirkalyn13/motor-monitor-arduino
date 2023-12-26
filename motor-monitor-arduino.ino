@@ -1,21 +1,33 @@
-#include "EmonLib.h"                   // Include Emon Library
-EnergyMonitor emon4;                   // Create an instance
+#include "EmonLib.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// UNIT ID (UNIQUE PER UNIT):
+#define UNIT_ID 1137
+
+EnergyMonitor emon1;
+EnergyMonitor emon2; 
+EnergyMonitor emon3; 
+EnergyMonitor emon4;
 EnergyMonitor emon5;
 EnergyMonitor emon6;
-
-#include "EmonLib.h"             // Include Emon Library
 
 #define VOLT_CAL_1 395
 #define VOLT_CAL_2 390
 #define VOLT_CAL_3 505
 
-EnergyMonitor emon1;             // Create an instance
-EnergyMonitor emon2; 
-EnergyMonitor emon3; 
-
 const int VS1_PIN = A0 ;
 const int VS2_PIN = A1 ;
 const int VS3_PIN = A2 ;
+
+const float PHASE_SHIFT = 1.7;
+const float CURRENT_CALIBRATION = 14;
+const int DELAY = 100;
+
+#define ONE_WIRE_BUS 2
+OneWire oneWire(ONE_WIRE_BUS); 
+DallasTemperature sensors(&oneWire);
+DeviceAddress insideThermometer;
 
 // For metrics computation
 float voltageMetrics1 = 0.00;
@@ -26,27 +38,7 @@ float currentMetrics2 = 0.00;
 float currentMetrics3 = 0.00;
 float temperatureMetrics = 0.00;
 
-const float PHASE_SHIFT = 1.7;
-const float CURRENT_CALIBRATION = 14;
-const int DELAY = 100;
-
-// Include the libraries we need
-#include <OneWire.h>
-#include <DallasTemperature.h>
-
-// Data wire is plugged into port 2 on the Arduino
-#define ONE_WIRE_BUS 2
-
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-OneWire oneWire(ONE_WIRE_BUS);
-
-// Pass our oneWire reference to Dallas Temperature. 
-DallasTemperature sensors(&oneWire);
-
-// arrays to hold device address
-DeviceAddress insideThermometer;
-
-// Metrics Struct
+// Structs
 struct Metrics {
   float value1;
   float value2;
