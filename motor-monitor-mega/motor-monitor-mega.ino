@@ -57,19 +57,16 @@ struct MetricsModel {
 
 // WIFI FUNCTIONS:
 void sendMetrics(MetricsModel metrics) {
-  Serial.print(metrics.line1Voltage);
-  Serial.print(",");
-  Serial.print(metrics.line2Voltage);
-  Serial.print(",");
-  Serial.print(metrics.line3Voltage);
-  Serial.print(",");
-  Serial.print(metrics.line1Current);
-  Serial.print(",");
-  Serial.print(metrics.line2Current);
-  Serial.print(",");
-  Serial.print(metrics.line3Current);
-  Serial.print(",");
-  Serial.println(metrics.temperature);
+  String dataString = String(metrics.line1Voltage) + "," +
+    String(metrics.line2Voltage) + "," +
+    String(metrics.line3Voltage) + "," +
+    String(metrics.line1Current) + "," +
+    String(metrics.line2Current) + "," +
+    String(metrics.line3Current) + "," +
+    String(metrics.temperature) + "\n";
+  
+  Serial3.write(dataString.c_str());
+  Serial.println(dataString);
 }
 
 // VOLTAGE FUNCTIONS:
@@ -141,7 +138,7 @@ float getTemperature(DeviceAddress deviceAddress)
   if(tempC == DEVICE_DISCONNECTED_C) 
   {
     // Serial.println("Error: Could not read temperature data");
-    return;
+    return 0.00;
   }
   // Serial.print("Temp C : ");
   // Serial.println(tempC);
@@ -157,6 +154,7 @@ void setup(void)
   Serial.println("MOTOR MONITOR");
   Serial.println("Initializing...");
   Serial.begin(9600);
+  Serial3.begin(9600);
 
   // Voltage: input pin, calibration, phase_shift
   emon1.voltage(VS1_PIN, VOLT_CAL_1, PHASE_SHIFT);  
