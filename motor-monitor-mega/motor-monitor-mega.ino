@@ -24,6 +24,7 @@ const float PHASE_SHIFT = 1.7;
 const float CURRENT_CALIBRATION = 14;
 const int DELAY = 100;
 
+#define LED_PIN 13
 #define ONE_WIRE_BUS 2
 OneWire oneWire(ONE_WIRE_BUS); 
 DallasTemperature sensors(&oneWire);
@@ -66,7 +67,7 @@ void sendMetrics(MetricsModel metrics) {
     String(metrics.temperature) + "\n";
   
   Serial3.write(dataString.c_str());
-  Serial.println(dataString);
+  Serial.print(dataString);
 }
 
 // VOLTAGE FUNCTIONS:
@@ -155,6 +156,10 @@ void setup(void)
   Serial.println("Initializing...");
   Serial.begin(9600);
   Serial3.begin(9600);
+
+  // LED indicator
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
 
   // Voltage: input pin, calibration, phase_shift
   emon1.voltage(VS1_PIN, VOLT_CAL_1, PHASE_SHIFT);  
