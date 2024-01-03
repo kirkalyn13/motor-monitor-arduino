@@ -157,6 +157,7 @@ void setup(void)
   Serial.begin(9600);
   Serial3.begin(9600);
 
+  // LED indicator
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
@@ -195,16 +196,11 @@ void setup(void)
   Serial.print("Device 0 Resolution: ");
   Serial.print(sensors.getResolution(insideThermometer), DEC); 
   Serial.println();
-
-  delay(1000);
-  digitalWrite(LED_PIN, LOW);
 }
 
 // MAIN LOOP
 void loop(void)
 { 
-  digitalWrite(LED_PIN, HIGH);
-
   voltageMetrics1 = 0.00;
   voltageMetrics2 = 0.00;
   voltageMetrics3 = 0.00;
@@ -239,6 +235,4 @@ void loop(void)
       sendMetrics(metrics);
     }
   }
-
-  digitalWrite(LED_PIN, LOW);
 }
