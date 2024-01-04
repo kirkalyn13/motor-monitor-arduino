@@ -106,7 +106,6 @@ bool postRequest(String method, String endpoint)
   return isSuccess;
 }
 
-// Change args to MetricsModel when migrated
 void sendMetrics(String dataString) 
 {
   MetricsModel metrics = parseMetrics(dataString);
