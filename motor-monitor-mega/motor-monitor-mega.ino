@@ -23,6 +23,7 @@ const int VS3_PIN = A2 ;
 const float PHASE_SHIFT = 1.7;
 const float CURRENT_CALIBRATION = 14;
 const int DELAY = 100;
+const int GRANULARITY = 29;
 
 #define LED_PIN 13
 #define ONE_WIRE_BUS 2
@@ -209,7 +210,7 @@ void loop(void)
   currentMetrics3 = 0.00;
   temperatureMetrics = 0.00;
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < GRANULARITY; i++) {
     Metrics voltageMetrics = measureVoltage();
     Metrics currentMetrics = measureCurrent();
 
@@ -221,7 +222,7 @@ void loop(void)
     currentMetrics3 += currentMetrics.value3;
     temperatureMetrics += measureTemperature();
 
-    if ( i == 9 ) {
+    if ( i == GRANULARITY - 1 ) {
       MetricsModel metrics;
 
       metrics.line1Voltage = voltageMetrics1/10;
