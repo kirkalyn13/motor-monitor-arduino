@@ -225,13 +225,13 @@ void loop(void)
     if ( i == GRANULARITY - 1 ) {
       MetricsModel metrics;
 
-      metrics.line1Voltage = voltageMetrics1/10;
-      metrics.line2Voltage = voltageMetrics2/10;
-      metrics.line3Voltage = voltageMetrics3/10;
-      metrics.line1Current = currentMetrics1/10;
-      metrics.line2Current = currentMetrics2/10;
-      metrics.line3Current = currentMetrics3/10;
-      metrics.temperature = temperatureMetrics/10;
+      metrics.line1Voltage = voltageMetrics1/GRANULARITY;
+      metrics.line2Voltage = voltageMetrics2/GRANULARITY;
+      metrics.line3Voltage = voltageMetrics3/GRANULARITY;
+      metrics.line1Current = currentMetrics1/GRANULARITY;
+      metrics.line2Current = currentMetrics2/GRANULARITY;
+      metrics.line3Current = currentMetrics3/GRANULARITY;
+      metrics.temperature = temperatureMetrics/GRANULARITY;
 
       sendMetrics(metrics);
     }
