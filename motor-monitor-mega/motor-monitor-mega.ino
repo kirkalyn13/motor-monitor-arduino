@@ -12,9 +12,9 @@ EnergyMonitor emon4;
 EnergyMonitor emon5;
 EnergyMonitor emon6;
 
-#define VOLT_CAL_1 395
-#define VOLT_CAL_2 390
-#define VOLT_CAL_3 505
+#define VOLT_CAL_1 500
+#define VOLT_CAL_2 395
+#define VOLT_CAL_3 516
 
 const int VS1_PIN = A0 ;
 const int VS2_PIN = A1 ;
@@ -99,9 +99,9 @@ Metrics measureVoltage() {
 Metrics measureCurrent() {
   Metrics currentMetrics;
 
-  double irms1 = emon4.calcIrms(1480);  // Calculate Irms only
-  double irms2 = emon5.calcIrms(1480);  // Calculate Irms only
-  double irms3 = emon6.calcIrms(1480);  // Calculate Irms only
+  double irms1 = emon4.calcIrms(2000) + 0.1;  // Calculate Irms only
+  double irms2 = emon5.calcIrms(2000) + 0.1;  // Calculate Irms only
+  double irms3 = emon6.calcIrms(2000) + 0.1;  // Calculate Irms only
 
   // Serial.print("Current 1 : "); 
   // Serial.println(irms1);		       // Irms

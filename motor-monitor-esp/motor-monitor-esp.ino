@@ -4,8 +4,8 @@
 // UNIT ID:
 const int UNIT_ID = 1137; // Unique per unit; Change as needed.
 
-const char* ssid     = ""; // To be changed to a generic value.
-const char* password = ""; // To be changed to a generic value.
+const char* ssid     = "motor-monitor"; // generic value.
+const char* password = "motorpa55"; // generic value.
 const char* host = "motor-monitor-backend.onrender.com"; // Backend server URL
 const String userAgent = "motor-monitor-arduino/1.0";
 const int port = 443;
